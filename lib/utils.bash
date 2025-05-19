@@ -41,18 +41,21 @@ install_version() {
   fi
 
   (
+    rm -rf "$install_path"
+    install_path="${install_path%/*}/multi"
     mkdir -p "$install_path"
 
-    "$ASDF_DOWNLOAD_PATH/dotnet-install.sh" --install-dir "$ASDF_INSTALL_PATH" --channel STS --version "$ASDF_INSTALL_VERSION" --no-path
+    "$ASDF_DOWNLOAD_PATH/dotnet-install.sh" --install-dir "$install_path" --channel STS --version "$ASDF_INSTALL_VERSION" --no-path
 
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
 
-    rm -rf "$ASDF_DOWNLOAD_PATH/dotnet-install.sh"
+    rm -rf "$ASDF_DOWNLOAD_PATH"
     echo "$TOOL_NAME $version installation was successful!"
   ) || (
     rm -rf "$install_path"
+    rm -rf "$ASDF_DOWNLOAD_PATH"
     fail "An error ocurred while installing $TOOL_NAME $version."
   )
 }
